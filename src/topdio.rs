@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::Result;
 use crossterm::{
-    event::{self, Event, KeyCode},
+    event::{Event, KeyCode, KeyEvent, KeyModifiers},
     terminal::{disable_raw_mode, enable_raw_mode},
 };
 use sysinfo::{PidExt, Process, ProcessExt, System, SystemExt};
@@ -73,7 +73,7 @@ pub trait TopdioQuitter {
     fn poll_quit(&self, timeout: Duration) -> Result<bool>;
 }
 
-/// Polls for a `'q'` stdin input from the user using [`crossterm::event::poll`].
+/// Polls for ctrl-c or q input from the user using [`crossterm::event::poll`].
 pub struct CrosstermQuitter {}
 
 impl CrosstermQuitter {
@@ -89,11 +89,20 @@ impl Drop for CrosstermQuitter {
     }
 }
 
+const Q: KeyEvent = KeyEvent {
+    code: KeyCode::Char('q'),
+    modifiers: KeyModifiers::NONE,
+};
+const CTRL_C: KeyEvent = KeyEvent {
+    code: KeyCode::Char('c'),
+    modifiers: KeyModifiers::CONTROL,
+};
+
 impl TopdioQuitter for CrosstermQuitter {
     fn poll_quit(&self, timeout: Duration) -> Result<bool> {
         if crossterm::event::poll(timeout)? {
-            if let Event::Key(key) = event::read()? {
-                if key.code == KeyCode::Char('q') {
+            if let Event::Key(key_event) = crossterm::event::read()? {
+                if key_event == Q || key_event == CTRL_C {
                     return Ok(true);
                 }
             }

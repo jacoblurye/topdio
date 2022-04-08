@@ -69,11 +69,7 @@ impl UI {
                 })
                 .collect();
             let table = Table::new(rows)
-                .block(
-                    Block::default()
-                        .title("TOPDIO (q: quit)")
-                        .borders(Borders::ALL),
-                )
+                .block(Block::default().title("TOPDIO").borders(Borders::ALL))
                 .header(Row::new(["PID", "COMMAND", "CPU USAGE"]))
                 .widths(&[
                     Constraint::Length(10),
