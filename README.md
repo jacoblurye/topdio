@@ -1,5 +1,7 @@
 # topdio
 
+![crates.io](https://img.shields.io/crates/v/topdio.svg)
+
 Like [top](https://man7.org/linux/man-pages/man1/top.1.html), but with audio. Listen to your computer's resource usage statistics.
 
 ## Installation
