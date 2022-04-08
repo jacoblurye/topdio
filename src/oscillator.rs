@@ -18,7 +18,7 @@ use cpal::{
 use crate::topdio::{TopdioMessage, TopdioSubscriber};
 
 const TWO_PI: f32 = 2.0 * std::f32::consts::PI;
-const BUFFER_SIZE: usize = 8192;
+const BUFFER_SIZE: usize = 1024;
 
 /// Describes all parameters needed to determine an [`Wave`]'s next sample.
 #[derive(Debug, Clone, Copy)]
