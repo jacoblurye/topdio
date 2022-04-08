@@ -26,7 +26,7 @@ struct Args {
         short,
         long,
         help = "Number of oscillators to run simultaneously",
-        default_value_t = 20
+        default_value_t = 10
     )]
     num_oscillators: usize,
     #[clap(short, long, arg_enum, help = "Synth wave type", default_value_t = WaveType::Triangle)]
