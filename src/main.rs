@@ -19,7 +19,7 @@ struct Args {
         short,
         long,
         help = "Scaling factor for oscillator frequency (freq = freq_scale * cpu_usage)",
-        default_value_t = 7.
+        default_value_t = 20.
     )]
     freq_scale: f32,
     #[clap(
