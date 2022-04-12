@@ -50,7 +50,7 @@ impl UI {
         Ok(())
     }
 
-    pub fn render_frame(&mut self, processes: &Vec<ProcessInfo>) -> Result<()> {
+    pub fn render_frame(&mut self, processes: &[ProcessInfo]) -> Result<()> {
         self.terminal.draw(|frame| {
             let chunks = Layout::default()
                 .direction(Direction::Horizontal)

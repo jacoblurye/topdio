@@ -53,7 +53,7 @@ impl Ramp {
     }
 
     fn next(&self, val: f32) -> f32 {
-        if val == self.target {
+        if (val - self.target).abs() < f32::EPSILON {
             val
         } else if val > self.target {
             (val - self.rate).max(self.target)
@@ -84,17 +84,17 @@ where
         let freq = freq.max(0.0);
         let gain = gain.clamp(0.0, 1.0);
 
-        return Oscillator {
+        Oscillator {
             wave,
             sample_rate,
             state: OscillatorState {
-                freq: freq,
+                freq,
                 gain: 0.,
                 phase: 0.,
             },
             gain_ramp: Ramp::new(gain, gain / sample_rate),
             freq_ramp: Ramp::new(freq, 0.0),
-        };
+        }
     }
 
     pub fn next_sample(&mut self) -> S {
@@ -102,10 +102,10 @@ where
         state.phase = (state.phase + state.freq / self.sample_rate) % 1.0;
         state.freq = self.freq_ramp.next(state.freq);
         state.gain = self.gain_ramp.next(state.gain);
-        (self.wave)(&state)
+        (self.wave)(state)
     }
 
-    pub fn set_freq(&mut self, freq: f32) -> () {
+    pub fn set_freq(&mut self, freq: f32) {
         let rate = ((freq - self.state.freq) / (self.sample_rate)).abs();
         self.freq_ramp = Ramp::new(freq, rate)
     }

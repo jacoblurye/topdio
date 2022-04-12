@@ -43,7 +43,7 @@ pub enum TopdioMessage {
 impl TopdioMessage {
     /// Create a [`TopdioMessage::Stats`] from the given list of processes, filtering out
     /// the currently running process and sorting processes by descreasing CPU usage.
-    fn stats(processes: &Vec<ProcessInfo>) -> TopdioMessage {
+    fn stats(processes: &[ProcessInfo]) -> TopdioMessage {
         // Exclude the currently running process.
         let mut processes: Vec<ProcessInfo> = processes
             .iter()
@@ -153,7 +153,7 @@ impl Topdio {
         loop {
             system.refresh_all();
 
-            let processes = system
+            let processes: Vec<ProcessInfo> = system
                 .processes()
                 .iter()
                 .map(|(_, p)| ProcessInfo::new(p))
@@ -279,7 +279,7 @@ mod tests {
             messages: messages.clone(),
         };
         let quitter = TestQuitter::new(Some(1));
-        let mut topdio = Topdio::new(vec![Box::new(subscriber)]);
+        let mut topdio = Topdio::new(vec![Box::new(subscriber)], 100);
         topdio.run(&quitter).unwrap();
         assert_eq!(quitter.calls.borrow().len(), 2 as usize);
         assert_eq!(messages.borrow().len(), 3 as usize);
@@ -299,7 +299,7 @@ mod tests {
             messages: messages_2.clone(),
         };
         let quitter = TestQuitter::new(None);
-        let mut topdio = Topdio::new(vec![Box::new(subscriber_1), Box::new(subscriber_2)]);
+        let mut topdio = Topdio::new(vec![Box::new(subscriber_1), Box::new(subscriber_2)], 100);
         let err = topdio.run(&quitter).unwrap_err();
         assert_eq!(err.to_string(), "erroring!");
         assert_eq!(messages_1.borrow().len(), 3);
