@@ -10,8 +10,6 @@ use crossterm::{
 };
 use sysinfo::{PidExt, Process, ProcessExt, System, SystemExt};
 
-const TICK_RATE: Duration = Duration::from_millis(1000);
-
 /// Info about a system process.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProcessInfo {
@@ -113,12 +111,16 @@ impl TopdioQuitter for CrosstermQuitter {
 
 /// Gathers system info and broadcasts it to a set of subscribers.
 pub struct Topdio {
+    refresh_rate: Duration,
     subscribers: Vec<Box<dyn TopdioSubscriber>>,
 }
 
 impl Topdio {
-    pub fn new(subscribers: Vec<Box<dyn TopdioSubscriber>>) -> Topdio {
-        Topdio { subscribers }
+    pub fn new(subscribers: Vec<Box<dyn TopdioSubscriber>>, refresh_rate: u64) -> Topdio {
+        Topdio {
+            refresh_rate: Duration::from_millis(refresh_rate),
+            subscribers,
+        }
     }
 
     fn broadcast(&mut self, message: &TopdioMessage) -> Result<()> {
@@ -159,13 +161,14 @@ impl Topdio {
             let message = TopdioMessage::stats(&processes);
             self.broadcast(&message)?;
 
-            let timeout = TICK_RATE
+            let timeout = self
+                .refresh_rate
                 .checked_sub(last_tick.elapsed())
                 .unwrap_or_else(|| Duration::from_secs(0));
             if quitter.poll_quit(timeout)? {
                 break;
             }
-            if last_tick.elapsed() >= TICK_RATE {
+            if last_tick.elapsed() >= self.refresh_rate {
                 last_tick = Instant::now();
             }
         }

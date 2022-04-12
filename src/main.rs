@@ -31,6 +31,13 @@ struct Args {
     num_oscillators: usize,
     #[clap(short, long, arg_enum, help = "Synth wave type", default_value_t = WaveType::Triangle)]
     wave_type: WaveType,
+    #[clap(
+        short,
+        long,
+        help = "How often to refresh system stats in milliseconds",
+        default_value_t = 1000
+    )]
+    refresh_rate: u64,
 }
 
 #[derive(Clone, ArgEnum)]
@@ -76,7 +83,10 @@ fn main() -> Result<()> {
 
     let ui = UI::new().unwrap();
 
-    let mut topdio = Topdio::new(vec![Box::new(oscillator_manager), Box::new(ui)]);
+    let mut topdio = Topdio::new(
+        vec![Box::new(oscillator_manager), Box::new(ui)],
+        args.refresh_rate,
+    );
     topdio
         .run(&CrosstermQuitter::new()?)
         .context("topdio failed")

@@ -17,5 +17,5 @@ cargo install topdio
 ```bash
 topdio
 # or, with non-default arguments:
-topdio --num-oscillators 30 --wave-type sine --freq-scale 50
+topdio --num-oscillators 30 --wave-type sine --freq-scale 50 --refresh-rate 500
 ```
