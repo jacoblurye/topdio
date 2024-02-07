@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use clap::{ArgEnum, Parser};
 use cpal::{
     traits::{DeviceTrait, HostTrait},
-    Device, Host, Sample, StreamConfig,
+    Device, FromSample, Host, Sample, StreamConfig,
 };
 use topdio::{
     oscillator::{sine, triangle, OscillatorManager, Wave},
@@ -49,7 +49,7 @@ pub enum WaveType {
 impl WaveType {
     pub fn wave<S>(&self) -> Wave<S>
     where
-        S: Sample,
+        S: Sample + FromSample<f32>,
     {
         match self {
             WaveType::Triangle => triangle::<S>,
