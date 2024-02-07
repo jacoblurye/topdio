@@ -12,7 +12,7 @@ use std::{
 use anyhow::{Context, Result};
 use cpal::{
     traits::{DeviceTrait, StreamTrait},
-    Device, Sample, Stream, StreamConfig,
+    Device, FromSample, Sample, SizedSample, Stream, StreamConfig,
 };
 
 use crate::topdio::{TopdioMessage, TopdioSubscriber};
@@ -28,14 +28,14 @@ pub struct OscillatorState {
     pub phase: f32,
 }
 
-pub fn sine<S: Sample>(state: &OscillatorState) -> S {
+pub fn sine<S: Sample + FromSample<f32>>(state: &OscillatorState) -> S {
     let sample = state.gain * (TWO_PI * state.phase).sin();
-    Sample::from(&sample)
+    S::from_sample::<f32>(sample)
 }
 
-pub fn triangle<S: Sample>(state: &OscillatorState) -> S {
+pub fn triangle<S: Sample + FromSample<f32>>(state: &OscillatorState) -> S {
     let sample = 4.0 * state.gain * (state.phase - (state.phase + 0.5).floor()).abs() - state.gain;
-    Sample::from(&sample)
+    S::from_sample::<f32>(sample)
 }
 
 pub type Wave<S> = fn(&OscillatorState) -> S;
@@ -122,7 +122,7 @@ struct StreamHandle {
 /// statistics into changes that affect the oscillators.
 pub struct OscillatorManager<S>
 where
-    S: Sample + PartialEq + Sum + Debug + Send + 'static,
+    S: Sample + SizedSample + FromSample<f32> + PartialEq + Sum + Debug + Send + 'static,
 {
     oscillators: Arc<Mutex<Vec<Oscillator<S>>>>,
     config: Arc<StreamConfig>,
@@ -133,7 +133,7 @@ where
 
 impl<S> OscillatorManager<S>
 where
-    S: Sample + PartialEq + Sum + Debug + Send + 'static,
+    S: Sample + SizedSample + FromSample<f32> + PartialEq + Sum + Debug + Send + 'static,
 {
     /// Create a new [`OscillatorManager`] with the given number of oscillators, all with the
     /// given wave function. Calling this function does not create an audio output stream.
@@ -207,6 +207,7 @@ where
                 }
             },
             |err| panic!("{:?}", err),
+            None,
         )?;
         stream.play()?;
 
@@ -234,7 +235,7 @@ where
 
 impl<S> TopdioSubscriber for OscillatorManager<S>
 where
-    S: Sample + PartialEq + Sum + Debug + Send + 'static,
+    S: SizedSample + FromSample<f32> + Sample + PartialEq + Sum + Debug + Send + 'static,
 {
     fn handle(&mut self, message: &TopdioMessage) -> Result<()> {
         match message {
