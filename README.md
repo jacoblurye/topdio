@@ -26,7 +26,7 @@ For more musical results, try the `--quantize` flag. For example:
 ```bash
 # Quantize to a pentatonic scale with a very fast refresh rate.
 # (tip: try different waveforms with --wave)
-topdio --quantize pentatonic --glide 0.2 --refresh-rate 0.08 --freq-floor 200 --num-oscillators 5
+topdio --quantize pentatonic --glide 0.2 --refresh-rate 0.1 --freq-floor 200 --num-oscillators 5
 
 # Quantize to an overtone series with a very slow refresh rate.
 topdio -q overtone -w sine -g 0.9 -r 10 -f 150
