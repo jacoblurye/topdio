@@ -1,6 +1,6 @@
 [package]
 name = "topdio"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 repository = "https://github.com/jacoblurye/topdio"
 documentation = "https://docs.rs/topdio"
@@ -8,10 +8,10 @@ description = "Like top, but with audio. Listen to your computer's resource usag
 license = "MIT"
 
 [dependencies]
-anyhow = { version = "1.0.56" }
-clap = { version = "3.1.8", features = ["derive"] }
-cpal = { version = "0.15.2" }
-crossterm = { version = "0.23.1" }
+anyhow = { version = "1.0.94" }
+clap = { version = "4.5.23", features = ["derive"] }
+cpal = { version = "0.15.3" }
+crossterm = { version = "0.28.1" }
 rand = { version = "0.8.5" }
-sysinfo = { version = "0.23.5" }
-tui = { version = "0.17.0" }
+sysinfo = { version = "0.33.0" }
+tui = { version = "0.19.0" }

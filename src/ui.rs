@@ -7,26 +7,13 @@ use std::io::{stdout, Stdout};
 use tui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
-    style::Color,
-    style::Style,
+    style::{Modifier, Style},
+    text::Text,
     widgets::{Block, Borders, Row, Table},
     Terminal,
 };
 
 use crate::topdio::{ProcessInfo, TopdioMessage, TopdioSubscriber};
-
-const COLORS: [Color; 6] = [
-    Color::LightBlue,
-    Color::LightCyan,
-    Color::LightGreen,
-    Color::LightMagenta,
-    Color::LightRed,
-    Color::LightYellow,
-];
-
-fn get_process_color(pid: u32) -> Color {
-    COLORS[(pid as usize) % COLORS.len()]
-}
 
 pub struct UI {
     terminal: Terminal<CrosstermBackend<Stdout>>,
@@ -59,18 +46,18 @@ impl UI {
             let rows: Vec<_> = processes
                 .iter()
                 .map(|p| {
-                    let color = get_process_color(p.pid);
                     Row::new([
                         p.pid.to_string(),
-                        p.name.clone(),
+                        p.name.to_str().unwrap_or("(none)").to_string(),
                         format!("{:.2}%", p.cpu_usage),
                     ])
-                    .style(Style::default().fg(color))
                 })
                 .collect();
             let table = Table::new(rows)
                 .block(Block::default().title("TOPDIO").borders(Borders::ALL))
-                .header(Row::new(["PID", "COMMAND", "CPU USAGE"]))
+                .header(Row::new(["PID", "COMMAND", "CPU USAGE"].iter().map(|s| {
+                    Text::styled(*s, Style::default().add_modifier(Modifier::BOLD))
+                })))
                 .widths(&[
                     Constraint::Length(10),
                     Constraint::Length(45),
@@ -89,17 +76,5 @@ impl TopdioSubscriber for UI {
             TopdioMessage::Stats { processes } => self.render_frame(processes),
             TopdioMessage::Stop => self.teardown(),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_get_process_color() {
-        assert_eq!(get_process_color(0), Color::LightBlue);
-        assert_eq!(get_process_color(5), Color::LightYellow);
-        assert_eq!(get_process_color(14), Color::LightGreen);
     }
 }
