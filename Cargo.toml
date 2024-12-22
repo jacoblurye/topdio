@@ -10,7 +10,7 @@ license = "MIT"
 [dependencies]
 anyhow = { version = "1.0.56" }
 clap = { version = "3.1.8", features = ["derive"] }
-cpal = { version = "0.13.5" }
+cpal = { version = "0.15.2" }
 crossterm = { version = "0.23.1" }
 rand = { version = "0.8.5" }
 sysinfo = { version = "0.23.5" }
